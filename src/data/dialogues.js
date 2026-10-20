@@ -1,0 +1,317 @@
+// 关键对话：没有 HP / 攻击 / 防御，只有理解、戒备、耐心。
+// 每个场景有一个隐藏诉求；听/问可以揭示，说中诉求会大幅增加理解。
+export const DIALOGUES = [
+  // ---------------- 5 场主线 ----------------
+  {
+    id: 'd_main_hr', type: 'main', title: '补偿谈判', npc: 'HR Vivian', npcColor: '#9a6f8d',
+    intro: '会议室的百叶窗半开着。Vivian 把一份文件推过来：“补偿方案都在这，你看看有没有问题。”',
+    need: '她想尽快结案，不想被上级追责。', needLabel: '尽快结案 / 不被追责',
+    guard: 42, patience: 5,
+    questions: [
+      { text: '补偿基数按什么算？', reveal: 'fact', understanding: 6, guard: 2, line: '她翻到第二页：“按去年平均工资，含绩效。”' },
+      { text: '背调会怎么说？', reveal: 'need', understanding: 10, guard: 5, line: '她停顿了一下：“正常离职，不会说别的。”' },
+    ],
+    stances: [
+      { label: '事实', text: '把工资流水和补偿明细摊开，逐项对。', stat: 'pro', understanding: 12, guard: 3, match: true },
+      { label: '共情', text: '“我知道你也在交差，我们别互相为难。”', stat: 'people', understanding: 9, guard: -4 },
+      { label: '坚持', text: '“这个数不对，我要走仲裁。”', stat: 'spirit', understanding: 4, guard: 9 },
+    ],
+    success: { cash: 2000, clue: 'comp_email', flag: 'hr_settled', spirit: 4 },
+    partial: { cash: 800, clue: 'comp_email', suspicion: 2 },
+    fail: { suspicion: 6, spirit: -4 },
+  },
+  {
+    id: 'd_main_boss', type: 'main', title: '前领导的项目', npc: '王总', npcColor: '#344a63',
+    intro: '王总约你在公司楼下抽烟。他说项目临时缺人，回来帮忙可以，但“职级要重新谈”。',
+    need: '他想让你救火，又不想显得公司在求你。', needLabel: '救火 / 给彼此留面子',
+    guard: 46, patience: 5,
+    questions: [
+      { text: '项目现在卡在哪？', reveal: 'need', understanding: 10, guard: 3, line: '他叹了口气：“客户只认你。”' },
+      { text: '回去是什么身份？', reveal: 'fact', understanding: 6, guard: 4, line: '“先按外包，做得好再转。”他没看你的眼睛。' },
+    ],
+    stances: [
+      { label: '给台阶', text: '“我可以救火，但咱们把边界和价钱写清楚。”', stat: 'people', understanding: 13, guard: -3, match: true },
+      { label: '旧情', text: '“当年你带我，我记着。”', stat: 'people', understanding: 8, guard: -2 },
+      { label: '硬刚', text: '“当初裁我的时候，怎么不谈感情？”', stat: 'spirit', understanding: 4, guard: 10 },
+    ],
+    success: { cash: 1200, route: { return: 2 }, clue: 'boss_wechat', flag: 'boss_offer', face: 2 },
+    partial: { cash: 500, route: { return: 1 }, suspicion: 3 },
+    fail: { spirit: -5, face: -3, suspicion: 4 },
+  },
+  {
+    id: 'd_main_landlord', type: 'main', title: '房东的语音', npc: '房东', npcColor: '#8a6f5a',
+    intro: '房东堵在门口，手机里放着 59 秒语音的结尾：“下个月涨 300，不同意就搬。”',
+    need: '他真正想要的是确定能收到钱。', needLabel: '确定能收到钱',
+    guard: 40, patience: 5,
+    questions: [
+      { text: '能不能按季度付？', reveal: 'need', understanding: 9, guard: -3, line: '他皱眉：“季度付可以，但得先交。”' },
+      { text: '房子哪里要修？', reveal: 'fact', understanding: 5, guard: 2, line: '“热水器有点问题，你自己看看。”' },
+    ],
+    stances: [
+      { label: '给方案', text: '“我年付，但涨租免了，合同写清楚。”', stat: 'people', understanding: 14, guard: -5, match: true },
+      { label: '哭穷', text: '“最近手头紧，宽限一个月。”', stat: 'people', understanding: 7, guard: 2 },
+      { label: '拖着', text: '“下周再说吧。”', stat: 'street', understanding: 2, guard: 8 },
+    ],
+    success: { cash: -500, clue: 'rent_contract', flag: 'rent_deal', spirit: 2 },
+    partial: { cash: -800, clue: 'rent_contract', suspicion: 2 },
+    fail: { cash: -1200, suspicion: 5 },
+  },
+  {
+    id: 'd_main_zhangpeng', type: 'main', title: '张鹏的局', npc: '张鹏', npcColor: '#d9a441',
+    intro: '张鹏在饭局上把车钥匙放在桌上：“我这边缺个合伙人，你要不要来？先投 5 万。”',
+    need: '他想被羡慕，也需要有人相信他。', needLabel: '被羡慕 / 有人相信',
+    guard: 46, patience: 5,
+    questions: [
+      { text: '现在现金流怎么样？', reveal: 'fact', understanding: 7, guard: 6, line: '他含糊地说：“还在爬坡。”' },
+      { text: '为什么找我？', reveal: 'need', understanding: 11, guard: 2, line: '他笑了：“你靠谱，而且你现在……有时间。”' },
+    ],
+    stances: [
+      { label: '夸他', text: '“你是真敢干，我一直佩服。”', stat: 'people', understanding: 12, guard: -4, match: true },
+      { label: '问细节', text: '把账、客户、退出机制一条条问。', stat: 'pro', understanding: 8, guard: 4 },
+      { label: '拒绝', text: '“我不投，也不去。”', stat: 'spirit', understanding: 3, guard: 7 },
+    ],
+    success: { route: { freelance: 1 }, clue: 'license', flag: 'zhangpeng_offer', spirit: 3 },
+    partial: { suspicion: 2, flag: 'zhangpeng_offer' },
+    fail: { cash: -500, spirit: -3, suspicion: 4 },
+  },
+  {
+    id: 'd_main_family', type: 'main', title: '家庭会议', npc: '一家人', npcColor: '#e2602e', family: true,
+    intro: '餐桌上的菜已经凉了。伴侣、孩子、父母都坐着。没有人先动筷子。',
+    need: '每个人都被听见，而不是被说服。', needLabel: '每个人都被听见',
+    guard: 55, patience: 7,
+    questions: [
+      { text: '先问伴侣最担心什么。', reveal: 'need', understanding: 10, guard: -3, line: '伴侣说：“我不是怕没钱，我是怕你什么都不说。”' },
+      { text: '问孩子最近怎么样。', reveal: 'fact', understanding: 6, guard: -2, line: '孩子小声说：“同学问我，你妈妈/爸爸是不是没工作了。”' },
+    ],
+    stances: [
+      { label: '坦白', text: '把补偿邮件、账单和计划都摊开，先说自己的害怕。', stat: 'trust', understanding: 16, guard: -8, match: true },
+      { label: '解释', text: '“我在想办法，再给我一点时间。”', stat: 'people', understanding: 8, guard: 3 },
+      { label: '沉默', text: '低头吃饭，等别人先开口。', stat: 'spirit', understanding: 1, guard: 9 },
+    ],
+    success: { trust: 12, spirit: 10, flag: 'family_consensus', route: { family: 1 } },
+    partial: { trust: 4, spirit: 2 },
+    fail: { trust: -10, spirit: -6, suspicion: 5 },
+  },
+
+  // ---------------- 12 场路线对话 ----------------
+  {
+    id: 'd_route_rehire', type: 'route', routeId: 'rehire', title: '终面', npc: '面试官', npcColor: '#344a63',
+    intro: '终面官翻着你的简历：“空窗期三个月，能解释一下吗？”',
+    need: '他要的是能马上上手、又不会太贵的人。', needLabel: '马上上手 / 性价比',
+    guard: 44, patience: 5,
+    questions: [
+      { text: '这个岗位最急的是什么？', reveal: 'need', understanding: 10, guard: 1, line: '“下个月要上线，没人接。”' },
+      { text: '团队现在几个人？', reveal: 'fact', understanding: 5, guard: 2, line: '“三个人，走了两个。”' },
+    ],
+    stances: [
+      { label: '数据', text: '拿出过去项目的数据，直接对应他们的上线节点。', stat: 'pro', understanding: 15, guard: -4, match: true },
+      { label: '表忠心', text: '“我愿意加班，随时到岗。”', stat: 'people', understanding: 8, guard: 2 },
+      { label: '谈条件', text: '“薪资不能低于上一份。”', stat: 'spirit', understanding: 4, guard: 8 },
+    ],
+    success: { route: { rehire: 2 }, flag: 'interview', clue: 'offer', cash: 0, spirit: 4 },
+    partial: { route: { rehire: 1 }, flag: 'interview', suspicion: 2 },
+    fail: { spirit: -4, suspicion: 3 },
+  },
+  {
+    id: 'd_route_exam', type: 'route', routeId: 'exam', title: '政审面谈', npc: '组织部门', npcColor: '#6f8f4d',
+    intro: '面谈室里，对方问：“你这个年龄来考编，是怎么想的？”',
+    need: '他要的是稳定、服从、没有风险的人。', needLabel: '稳定 / 无风险',
+    guard: 40, patience: 5,
+    questions: [
+      { text: '这个岗位最看重什么？', reveal: 'need', understanding: 9, guard: 1, line: '“能待得住，别干两年就走。”' },
+      { text: '之前为什么离开？', reveal: 'fact', understanding: 5, guard: 4, line: '你解释了合同到期，对方点点头。' },
+    ],
+    stances: [
+      { label: '稳定', text: '“我想在这里长期做，也愿意从基层开始。”', stat: 'people', understanding: 13, guard: -3, match: true },
+      { label: '理想', text: '“我想做点真正有意义的事。”', stat: 'spirit', understanding: 8, guard: 4 },
+      { label: '反问', text: '“年龄是问题吗？”', stat: 'spirit', understanding: 3, guard: 9 },
+    ],
+    success: { route: { exam: 2 }, flag: 'exam_interview', spirit: 4 },
+    partial: { route: { exam: 1 }, suspicion: 2 },
+    fail: { spirit: -4, suspicion: 2 },
+  },
+  {
+    id: 'd_route_return', type: 'route', routeId: 'return', title: '返聘谈判', npc: '王总', npcColor: '#8a6f5a',
+    intro: '王总把咖啡推到你面前：“回来可以，但职级和薪水要重新定。”',
+    need: '他需要你救火，但不能让公司显得在求人。', needLabel: '救火 / 公司面子',
+    guard: 48, patience: 5,
+    questions: [
+      { text: '项目到底缺什么？', reveal: 'need', understanding: 11, guard: 2, line: '“客户只认你，别人压不住。”' },
+      { text: '职级能恢复到原来吗？', reveal: 'fact', understanding: 6, guard: 5, line: '他摇头：“先降一级，后面再说。”' },
+    ],
+    stances: [
+      { label: '给台阶', text: '“我可以先以顾问身份回来，把项目救下来再谈。”', stat: 'people', understanding: 15, guard: -5, match: true },
+      { label: '旧情', text: '“当年你带我，我信你。”', stat: 'people', understanding: 9, guard: -2 },
+      { label: '硬刚', text: '“降级可以，补偿先谈。”', stat: 'spirit', understanding: 5, guard: 7 },
+    ],
+    success: { route: { return: 2 }, cash: 1000, clue: 'boss_wechat', spirit: 2 },
+    partial: { route: { return: 1 }, face: -2, suspicion: 2 },
+    fail: { face: -5, spirit: -3, suspicion: 4 },
+  },
+  {
+    id: 'd_route_content', type: 'route', routeId: 'content', title: '甲方改稿', npc: '品牌方', npcColor: '#c05a3e',
+    intro: '品牌方在语音里说：“你这条太真实了，能不能再正能量一点？”',
+    need: '她要安全、能带货、别翻车。', needLabel: '安全 / 能带货',
+    guard: 42, patience: 5,
+    questions: [
+      { text: '你们最怕什么？', reveal: 'need', understanding: 10, guard: 1, line: '“怕评论区翻车，也怕没转化。”' },
+      { text: '预算和排期呢？', reveal: 'fact', understanding: 5, guard: 2, line: '“预算就这些，下周要发。”' },
+    ],
+    stances: [
+      { label: '数据', text: '拿出完播率和转化数据，给出一个折中脚本。', stat: 'pro', understanding: 14, guard: -3, match: true },
+      { label: '创意', text: '“你给我自由，我给你爆款。”', stat: 'street', understanding: 8, guard: 4 },
+      { label: '坚持', text: '“不改，这就是我的风格。”', stat: 'spirit', understanding: 4, guard: 8 },
+    ],
+    success: { route: { content: 2 }, cash: 800, suspicion: 3, spirit: 3 },
+    partial: { route: { content: 1 }, cash: 300, suspicion: 2 },
+    fail: { suspicion: 8, spirit: -3 },
+  },
+  {
+    id: 'd_route_freelance', type: 'route', routeId: 'freelance', title: '客户报价', npc: '客户', npcColor: '#58789a',
+    intro: '客户说：“预算只有 5000，但我看你挺专业的。”',
+    need: '他预算有限，但不想显得自己不专业。', needLabel: '预算有限 / 要专业',
+    guard: 44, patience: 5,
+    questions: [
+      { text: '这活儿最核心的交付是什么？', reveal: 'need', understanding: 10, guard: 1, line: '“能让老板看懂就行。”' },
+      { text: '后续还有需求吗？', reveal: 'fact', understanding: 5, guard: 2, line: '“做得好，后面还有。”' },
+    ],
+    stances: [
+      { label: '拆报价', text: '把工作拆成三档，让他选，不直接降价。', stat: 'pro', understanding: 14, guard: -4, match: true },
+      { label: '低价', text: '“3000 我也能做。”', stat: 'street', understanding: 7, guard: 2 },
+      { label: '讲情怀', text: '“我最近刚出来，想做个好作品。”', stat: 'people', understanding: 5, guard: 4 },
+    ],
+    success: { route: { freelance: 2 }, cash: 1200, clue: 'client_praise', spirit: 3 },
+    partial: { route: { freelance: 1 }, cash: 600, suspicion: 2 },
+    fail: { spirit: -3, cash: -100 },
+  },
+  {
+    id: 'd_route_stall', type: 'route', routeId: 'stall', title: '夜市的位置', npc: '大刘', npcColor: '#d9a441',
+    intro: '大刘指着路口：“这个位置流量好，但城管来得也勤。你敢不敢摆？”',
+    need: '他不想你挡路，也不想你惹事。', needLabel: '别挡路 / 别惹事',
+    guard: 38, patience: 5,
+    questions: [
+      { text: '几点收摊最安全？', reveal: 'need', understanding: 9, guard: 1, line: '“十点前，别等他们来。”' },
+      { text: '什么最好卖？', reveal: 'fact', understanding: 5, guard: 2, line: '“便宜、热、出餐快。”' },
+    ],
+    stances: [
+      { label: '配合', text: '“我按你的时间来，垃圾自己收，不给你添麻烦。”', stat: 'people', understanding: 13, guard: -4, match: true },
+      { label: '讲理', text: '“我交摊位费，凭什么不能摆？”', stat: 'spirit', understanding: 6, guard: 6 },
+      { label: '硬顶', text: '“我就摆，能把我怎么样。”', stat: 'street', understanding: 2, guard: 10 },
+    ],
+    success: { route: { stall: 2 }, cash: 200, flag: 'stall', spirit: 3 },
+    partial: { route: { stall: 1 }, cash: 50, suspicion: 3 },
+    fail: { cash: -300, suspicion: 5, spirit: -2 },
+  },
+  {
+    id: 'd_route_openstore', type: 'route', routeId: 'openstore', title: '铺面谈判', npc: '铺面房东', npcColor: '#8a6f5a',
+    intro: '房东把钥匙放在桌上：“转让费 8 万，押三付一。你看着办。”',
+    need: '他要的是租金安全、租期稳定。', needLabel: '租金安全 / 长期稳定',
+    guard: 46, patience: 5,
+    questions: [
+      { text: '这条街人流怎么样？', reveal: 'fact', understanding: 6, guard: 2, line: '“工作日一般，周末还行。”' },
+      { text: '为什么上一个租客走了？', reveal: 'need', understanding: 10, guard: 4, line: '“太累，没撑住。”' },
+    ],
+    stances: [
+      { label: '年付方案', text: '“我签三年，年付，但转让费砍到 5 万。”', stat: 'people', understanding: 14, guard: -5, match: true },
+      { label: '画饼', text: '“我以后做大了，还能给你带人流。”', stat: 'street', understanding: 6, guard: 5 },
+      { label: '砍价', text: '“太贵了，我再看看。”', stat: 'spirit', understanding: 3, guard: 7 },
+    ],
+    success: { route: { openstore: 2 }, cash: -500, clue: 'license', flag: 'learn_coffee', spirit: 2 },
+    partial: { route: { openstore: 1 }, cash: -1000, suspicion: 2 },
+    fail: { cash: -1500, spirit: -3 },
+  },
+  {
+    id: 'd_route_gig', type: 'route', routeId: 'gig', title: '车队队长', npc: '队长', npcColor: '#e2602e',
+    intro: '队长看了看你的车：“跑过吗？我们这儿不养闲人，超时要扣钱。”',
+    need: '他要能跑、不惹事、稳定出勤的人。', needLabel: '能跑 / 稳定 / 不惹事',
+    guard: 40, patience: 5,
+    questions: [
+      { text: '你们最缺什么时段的人？', reveal: 'need', understanding: 10, guard: 1, line: '“晚高峰和周末，最缺。”' },
+      { text: '扣钱规则是什么？', reveal: 'fact', understanding: 5, guard: 2, line: '“超时一单扣 2 块，差评扣 10。”' },
+    ],
+    stances: [
+      { label: '亮数据', text: '“我熟这三个商圈，晚高峰能跑 15 单。”', stat: 'street', understanding: 13, guard: -3, match: true },
+      { label: '求带', text: '“哥，我刚入行，你多带带我。”', stat: 'people', understanding: 8, guard: 2 },
+      { label: '谈条件', text: '“扣钱可以，补贴得说清楚。”', stat: 'spirit', understanding: 5, guard: 6 },
+    ],
+    success: { route: { gig: 2 }, cash: 300, flag: 'gig', health: -1 },
+    partial: { route: { gig: 1 }, cash: 100, health: -2 },
+    fail: { health: -4, spirit: -2 },
+  },
+  {
+    id: 'd_route_crossborder', type: 'route', routeId: 'crossborder', title: '供应商谈判', npc: '工厂老板', npcColor: '#4d7f7a',
+    intro: '工厂老板报了个价，又补了一句：“量小的话，这个价做不了。”',
+    need: '他要稳定订单，又不想被你压得太狠。', needLabel: '稳定订单 / 别压太狠',
+    guard: 44, patience: 5,
+    questions: [
+      { text: '最小起订量是多少？', reveal: 'fact', understanding: 6, guard: 2, line: '“500 件，少了不划算。”' },
+      { text: '你们最怕什么？', reveal: 'need', understanding: 10, guard: 3, line: '“怕你卖一单就跑。”' },
+    ],
+    stances: [
+      { label: '长期合作', text: '“先 500 件，卖得好按季度返单，价格随行就市。”', stat: 'pro', understanding: 14, guard: -4, match: true },
+      { label: '压价', text: '“别家比你便宜 15%。”', stat: 'street', understanding: 6, guard: 7 },
+      { label: '讲情怀', text: '“我刚开始做，帮我一把。”', stat: 'people', understanding: 5, guard: 3 },
+    ],
+    success: { route: { crossborder: 2 }, cash: 500, clue: 'license', spirit: 2 },
+    partial: { route: { crossborder: 1 }, cash: -200, suspicion: 2 },
+    fail: { cash: -500, spirit: -3 },
+  },
+  {
+    id: 'd_route_home', type: 'route', routeId: 'home', title: '父母的饭桌', npc: '父母', npcColor: '#7b9c8d',
+    intro: '母亲把最大的那间房收拾出来，父亲在门口抽烟。他们说：“回来就好。”',
+    need: '他们只想知道你过得好，不用你逞强。', needLabel: '你过得好 / 不用逞强',
+    guard: 36, patience: 5,
+    questions: [
+      { text: '家里最近怎么样？', reveal: 'fact', understanding: 6, guard: -1, line: '“都挺好，就是你妈老念叨你。”' },
+      { text: '你们希望我留下吗？', reveal: 'need', understanding: 11, guard: -2, line: '父亲沉默了一会儿：“看你自己。”' },
+    ],
+    stances: [
+      { label: '说实话', text: '“我还没想好。但我确实累了。”', stat: 'trust', understanding: 15, guard: -8, match: true },
+      { label: '报喜', text: '“我在城里挺好的，马上就有新工作。”', stat: 'face', understanding: 7, guard: 4 },
+      { label: '沉默', text: '低头吃饭，不接话。', stat: 'spirit', understanding: 1, guard: 7 },
+    ],
+    success: { route: { home: 2 }, trust: 8, spirit: 5, flag: 'go_home' },
+    partial: { route: { home: 1 }, trust: 3, spirit: 2 },
+    fail: { trust: -5, spirit: -3 },
+  },
+  {
+    id: 'd_route_family', type: 'route', routeId: 'family', title: '家务分工', npc: '伴侣', npcColor: '#9a6f8d',
+    intro: '伴侣把一张写满字的纸推过来：“这是这个月家里的活。你看看，有几件是你做的？”',
+    need: 'ta 要被当作队友，不是被当作负担。', needLabel: '被当作队友',
+    guard: 40, patience: 5,
+    questions: [
+      { text: '你最近最累的是什么？', reveal: 'need', understanding: 11, guard: -4, line: '“不是活多，是我一个人扛。”' },
+      { text: '孩子最近怎么样？', reveal: 'fact', understanding: 6, guard: -1, line: '“她总问，你什么时候来接她。”' },
+    ],
+    stances: [
+      { label: '分工', text: '“我们把活重新排一遍，我也把我的时间写进去。”', stat: 'trust', understanding: 15, guard: -7, match: true },
+      { label: '道歉', text: '“对不起，我最近确实忽略了你。”', stat: 'people', understanding: 9, guard: -3 },
+      { label: '辩解', text: '“我也很累，我又不是没做事。”', stat: 'spirit', understanding: 3, guard: 8 },
+    ],
+    success: { route: { family: 2 }, trust: 8, spirit: 4, flag: 'family_consensus' },
+    partial: { route: { family: 1 }, trust: 3 },
+    fail: { trust: -6, spirit: -3 },
+  },
+  {
+    id: 'd_route_fake', type: 'route', routeId: 'fake', title: '第一个学员', npc: '学员', npcColor: '#b64a3b',
+    intro: '一个刚收到通知的年轻人问你：“哥/姐，怎么才能让家里看不出来？”',
+    need: '他要的不是骗术，是有人告诉他“没事”。', needLabel: '被理解 / 有人告诉他没事',
+    guard: 38, patience: 5,
+    questions: [
+      { text: '你最怕被谁发现？', reveal: 'need', understanding: 11, guard: -3, line: '“我妈。她身体不好。”' },
+      { text: '你现在住哪？', reveal: 'fact', understanding: 5, guard: 1, line: '“合租，室友都上班。”' },
+    ],
+    stances: [
+      { label: '真话', text: '“我可以教你演，但你也得找个人说真话。”', stat: 'people', understanding: 14, guard: -5, match: true },
+      { label: '画饼', text: '“报我的课，21 天包你瞒住。”', stat: 'street', understanding: 8, guard: 5 },
+      { label: '收钱', text: '“先转 200，剩下的再说。”', stat: 'street', understanding: 3, guard: 8 },
+    ],
+    success: { route: { fake: 2 }, cash: 500, flag: 'fake_coach', spirit: 2 },
+    partial: { route: { fake: 1 }, cash: 200, suspicion: 4 },
+    fail: { suspicion: 10, spirit: -3 },
+  },
+];
+
+export const DIALOGUE_BY_ID = Object.fromEntries(DIALOGUES.map((d) => [d.id, d]));
+export const MAIN_DIALOGUES = DIALOGUES.filter((d) => d.type === 'main');
+export const ROUTE_DIALOGUES = DIALOGUES.filter((d) => d.type === 'route');
